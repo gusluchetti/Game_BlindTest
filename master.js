@@ -1,19 +1,27 @@
+var StartText;
+var StartButton;
 var Squirrel;
 var Hazelnut;
 var Left;
 var Right;
 var Background;
-var BGMusic;
 
-//initializing game (this includes canvas, listeners and constant updating of game area) and components
-function startGame() {
+//title screen (title and start button)
+function startTitle() {
     gameArea.start();
     Background = new component(gameArea.canvas.width, gameArea.canvas.height, "resources/bg.jpg", 0, 0, "image");
+    StartButton = new component(200, 100, "#df7126", gameArea.canvas.width / 2 - 100, gameArea.canvas.height  / 2);
+    StartText = new component(gameArea.canvas.width / 3, 0, "", 0, 0, "text");
+
+}
+
+// start game and its components
+function startGame() {
+    gameArea.start();
     Squirrel = new component(64, 64, "resources/squirrel.png", gameArea.canvas.width / 2 - 32, gameArea.canvas.height - 64, "image");
     Hazelnut = new component(64, 64, "resources/hazelnut.png", 30, 30, "image");
     Left = new component(gameArea.canvas.width / 2, gameArea.canvas.height / 2, "rgba(255, 255, 255, 0.5)", 0, gameArea.canvas.height - (gameArea.canvas.height / 2));
     Right = new component(gameArea.canvas.width / 2, gameArea.canvas.height / 2, "rgba(255, 255, 255, 0.5)", gameArea.canvas.width - gameArea.canvas.width / 2, gameArea.canvas.height - (gameArea.canvas.height / 2));
-
 }
 
 var gameArea = {
@@ -27,7 +35,7 @@ var gameArea = {
         this.interval = setInterval(updateGameArea, 20);
 
         //listening for mouse click
-		window.addEventListener('mousedown', function (e) {
+        window.addEventListener('mousedown', function (e) {
             gameArea.x = e.pageX;
             gameArea.y = e.pageY;
         })
@@ -40,15 +48,15 @@ var gameArea = {
 
         //listening for screen touch
         window.addEventListener('touchstart', function (e) {
-			gameArea.x = e.pageX;
-			gameArea.y = e.pageY;
-    	})
+            gameArea.x = e.pageX;
+            gameArea.y = e.pageY;
+        })
 
         //listening for screen touch release
-	    window.addEventListener('touchend', function (e) {
-			gameArea.x = false;
-			gameArea.y = false;
-	    })
+        window.addEventListener('touchend', function (e) {
+            gameArea.x = false;
+            gameArea.y = false;
+        })
         
     },
     
@@ -57,13 +65,14 @@ var gameArea = {
     }
 }
 
+
 function component(width, height, color, x, y, type) {
     this.type = type;
     
     if (type == "image") {
-	    this.image = new Image();
-	    this.image.src = color;
-  	}
+        this.image = new Image();
+        this.image.src = color;
+    }
     
     this.width = width;
     this.height = height;
@@ -72,16 +81,28 @@ function component(width, height, color, x, y, type) {
     this.speedX = 0;
     this.speedY = 0;
 
-    this.update = function(){
+    this.update = function() {
+
         context = gameArea.context;
 
-		if (type == "image") {
-      	context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        if (type == "image") {
+        context.drawImage(this.image, this.x, this.y, this.width, this.height);
 
-    	} else {
-	        context.fillStyle = "rgba(255, 255, 255, 0)";
-	        context.fillRect(this.x, this.y, this.width, this.height);
-    	}
+        } 
+
+        else {
+            context.fillStyle = "rgba(255, 255, 255, 0.5)";
+            context.fillRect(this.x, this.y, this.width, this.height);
+        }
+
+        if (type == "text") {
+            context.font = "44px Arial";
+            context.textAlign = "center";
+            context.fillStyle = "rgba(255, 255, 255, 0.5)";
+            context.fillText("START!", gameArea.canvas.width / 2, gameArea.canvas.height  / 2 + 65); 
+    
+        }
+
     }   
 
     // checking if "buttons" were clicked
@@ -89,11 +110,11 @@ function component(width, height, color, x, y, type) {
     var myleft = this.x;
     var myright = this.x + (this.width);
     var clicked = true;
-	    if ((myright < gameArea.x) || (myleft > gameArea.x)) {
-	      clicked = false;
-	    }
-		return clicked;
-  	}
+        if ((myright < gameArea.x) || (myleft > gameArea.x)) {
+          clicked = false;
+        }
+        return clicked;
+    }
 
 }   
 
@@ -102,17 +123,18 @@ function updateGameArea() {
     gameArea.clear();
 
     if (gameArea.x && gameArea.y) {
-	    if (Left.clicked()) {
-	      Squirrel.x += -7;
-	    }
-	    if (Right.clicked()) {
-	      Squirrel.x += 7;
-	    }
- 	}
+        if (Left.clicked()) {
+          Squirrel.x += -7;
+        }
+        if (Right.clicked()) {
+          Squirrel.x += 7;
+        }
+    }
 
- 	Background.update();
+    Squirrel.update();
     Left.update();
     Right.update();
     Hazelnut.update();
-    Squirrel.update();
+    Background.update();
+    StartText.update();
 }
