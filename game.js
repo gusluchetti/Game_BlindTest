@@ -3,10 +3,12 @@ var Hazelnut;
 var Left;
 var Right;
 var Background;
+var BGMusic
 
 //initializing game (this includes canvas, listeners and constant updating of game area) and components
 function startGame() {
 	gameArea.start();
+    BGMusic = new sound("");
     Squirrel = new component(64, 64, "resources/squirrel.png", gameArea.canvas.width / 2 - 32, gameArea.canvas.height - 64, "image");
     Hazelnut = new component(64, 64, "resources/hazelnut.png", 30, 30, "image");
     Background = new component(1366, gameArea.canvas.height, "resources/bg.jpg", 0, 0, "image");
@@ -82,6 +84,7 @@ function component(width, height, color, x, y, type) {
     	}
     }   
 
+    // checking if "buttons" were clicked
     this.clicked = function() {
     var myleft = this.x;
     var myright = this.x + (this.width);
@@ -111,4 +114,20 @@ function updateGameArea() {
     Right.update();
     Hazelnut.update();
     Squirrel.update();
+}
+
+function sound(src) {
+  this.sound = document.createElement("audio");
+  this.sound.src = src;
+  this.sound.setAttribute("preload", "auto");
+  this.sound.setAttribute("controls", "none");
+  this.sound.style.display = "none";
+  document.body.appendChild(this.sound);
+
+  this.play = function(){
+    this.sound.play();
+  }
+  this.stop = function(){
+    this.sound.pause();
+  }
 }
