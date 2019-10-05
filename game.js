@@ -12,9 +12,13 @@ var Right;
 var Score;
 var sco = 0;
 var lives = 3;
-var spawn = 90;
+var spawn = 101;
 var bgmusic;
 var Background;
+var score, email;
+var godEmail;
+var topScore = 0, topEmail = "";
+
 
 //variable responsible for actual game canvas
 var gameArea = {
@@ -114,6 +118,33 @@ var menuScreen = {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }}
 
+//variable responsible for game over canvas (and data input)
+var gameOver = {
+    // making canvas for the first time
+    canvas : document.createElement("canvas"),
+    div : document.createElement("div"),
+
+    start : function() {
+        this.canvas.setAttribute("id", "lol");
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        if (this.canvas.width > 800) {
+            this.canvas.width = 800;
+        }
+        this.context = this.canvas.getContext("2d");
+
+        //making div with same specs as canvas        
+        
+        this.div.setAttribute("id", "gameOver");
+        this.div.width = this.canvas.width + "px";
+        this.div.height = window.innerHeight;
+        document.body.insertBefore(this.div, document.body.childNodes[0]);
+        this.canvas.remove();
+
+    },
+}
+
+
 //FUNCTIONS
 
 // title screen (title and start button)
@@ -140,6 +171,48 @@ function startGame() {
     Left = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", 0, gaH - (gaH / 2), "button");
     Right = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", gaW - gaW / 2, gaH - (gaH / 2), "button");
     Score = new component("30px", "Consolas", "black", 200, 40, "score");}
+
+function startInput() {
+    over = true;
+    gameOver.start();
+
+    var go = document.createElement("h2");
+    go.setAttribute("id", "go");
+    go.innerHTML = "GAME OVER!\n";
+
+    score = document.createElement("p");
+    score.setAttribute("id","score");
+    score.setAttribute("value", sco);
+    score.innerHTML = "Sua pontuação foi " + sco;
+
+    var a = document.createElement("label");
+    a.setAttribute("for", "email");
+
+    email = document.createElement("input");
+    email.setAttribute("id","email");
+    email.setAttribute("type","text");
+    email.setAttribute("placeholder", "Insira seu email");
+    
+    // button compares highscore with current score
+    var benjamin = document.createElement("button");
+    benjamin.setAttribute("id","send");
+    benjamin.setAttribute("onclick", "saveEmail(event)");
+    benjamin.setAttribute("onclick", "compare(" + godEmail + ", " + sco + ")\n");
+    benjamin.innerHTML = "Enviar";    
+
+    // button shows current highscore
+    var high = document.createElement("button");
+    high.setAttribute("id","highscore");
+    high.setAttribute("onclick", "window.alert(" + topScore + ", " + topEmail + ")");
+    high.innerHTML = "Mostrar highscore!";
+
+    document.getElementById("gameOver").appendChild(go);
+    document.getElementById("gameOver").appendChild(score);
+    document.getElementById("gameOver").appendChild(a);
+    document.getElementById("gameOver").appendChild(email);
+    document.getElementById("gameOver").appendChild(benjamin);
+    document.getElementById("gameOver").appendChild(high);
+}
 
 // facilitates creation of objects in current canvas
 function component(width, height, color, x, y, type) {
@@ -245,11 +318,14 @@ function component(width, height, color, x, y, type) {
 // updates canvas according to set interval (50fps in this case)
 function updateCanvas() {
     
-    //game over check
+    //game over check and go to html page
     if (lives <= 0 && game){
 		gameArea.stop();
-        game = false;
         bgmusic.stop();
+        old = document.getElementById("game");
+        old.remove();
+        game = false;
+        startInput();
 	}
     
     // update depending on current canvas
@@ -314,6 +390,14 @@ function updateCanvas() {
         if (Right.clicked()) {
           Squirrel.x += 7;
         }
+
+        //looping
+        if (Squirrel.x <= 0) {
+            Squirrel.x = gameArea.canvas.width - 1;
+        }
+        if (Squirrel.x >= gameArea.canvas.width) {
+            Squirrel.x = 1;
+        }
     }
 
     // updates for gameArea
@@ -322,6 +406,7 @@ function updateCanvas() {
 
         //hazelnut movement (y-axis)
         for(i = 0; i<Hazelnut.length; i += 1){
+            //hazelnut speed
             Hazelnut[i].y += 5;
             Hazelnut[i].update();
         }
@@ -343,6 +428,7 @@ function updateCanvas() {
 
     function sound(src) {
       this.sound = document.createElement("audio");
+      this.sound.setAttribute("id", "music");
       this.sound.src = src;
       this.sound.setAttribute("preload", "auto");
       this.sound.setAttribute("controls", "none");
@@ -354,4 +440,19 @@ function updateCanvas() {
         this.stop = function(){
             this.sound.pause();
         }
+    }
+
+    function compare (email, score) {
+        this.email = email;
+        this.score = score;
+
+        if (score > topScore) {
+            topScore = score;
+            topEmail = email;
+        }     
+    }    
+
+    function saveEmail(event) {
+        godEmail = document.getElementById('email').value;
+        event.preventDefault();
 }
