@@ -193,7 +193,7 @@ function startInput() {
     var email = document.createElement("input");
     email.setAttribute("id","email");
     email.setAttribute("type","text");
-    email.setAttribute("placeholder", "Insira seu email");
+    email.setAttribute("placeholder", "Informe nosso atendimento!");
     
     // button compares highscore with current score
     var benjamin = document.createElement("button");
@@ -213,8 +213,6 @@ function startInput() {
     document.getElementById("gameOver").appendChild(score);
     document.getElementById("gameOver").appendChild(label);
     document.getElementById("gameOver").appendChild(email);
-    document.getElementById("gameOver").appendChild(benjamin);
-    document.getElementById("gameOver").appendChild(high);
 }
 
 // facilitates creation of objects in current canvas
