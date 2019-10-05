@@ -267,7 +267,9 @@ function updateCanvas() {
     for(i = 0; i<Hazelnut.length; i += 1) {
 		if (Squirrel.collect(Hazelnut[i])){
  			sco += 1;
- 			spawn -= 1;
+			if (spawn >= 36){
+				spawn -= 1;
+			}
  			Hazelnut.splice(i, 1);
  			i--;
  		}
