@@ -186,10 +186,10 @@ function component(width, height, color, x, y, type) {
         }
 
         else if (this.type == "score") {
-      		context.font = this.width + " " + this.height;
-      		context.fillStyle = color;
-            context.textAlign = "center";
-      		context.fillText(this.text, (msW / 2), msH / 20);
+	    context.font = "30x Comic Sans MS";
+	    context.fillStyle = color;
+	    context.textAlign = "center";
+	    context.fillText(this.text, (msW / 2), msH / 20);
         }
 
         else {
