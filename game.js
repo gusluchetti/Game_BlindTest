@@ -189,7 +189,7 @@ function component(width, height, color, x, y, type) {
         }
 
         else if (this.type == "score") {
-	    context.font = "50px Comic Sans MS";
+	    context.font = "35px Consolas";
 	    context.fillStyle = color;
 	    context.textAlign = "center";
 	    context.fillText(this.text, (msW / 2), (msH / 20) + 10);
