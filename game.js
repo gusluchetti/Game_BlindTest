@@ -13,6 +13,7 @@ var Score;
 var sco = 0;
 var lives = 3;
 var spawn = 90;
+var bgmusic;
 var Background;
 
 //variable responsible for actual game canvas
@@ -129,6 +130,8 @@ function startTitle() {
 // start game and its components
 function startGame() {
     game = true;
+    bgmusic = new sound("resources/gourmet_race_8bit.mp3");
+    bgmusic.play();
     gameArea.start();
     var gaW = gameArea.canvas.width;
     var gaH = gameArea.canvas.height;
@@ -186,10 +189,10 @@ function component(width, height, color, x, y, type) {
         }
 
         else if (this.type == "score") {
-	    context.font = "30x Comic Sans MS";
+	    context.font = "50px Comic Sans MS";
 	    context.fillStyle = color;
 	    context.textAlign = "center";
-	    context.fillText(this.text, (msW / 2), msH / 20);
+	    context.fillText(this.text, (msW / 2), (msH / 20) + 10);
         }
 
         else {
@@ -246,6 +249,7 @@ function updateCanvas() {
     if (lives <= 0 && game){
 		gameArea.stop();
         game = false;
+        bgmusic.stop();
 	}
     
     // update depending on current canvas
@@ -334,3 +338,18 @@ function updateCanvas() {
         StartButton.update();
         StartText.update();
     }}
+
+    function sound(src) {
+      this.sound = document.createElement("audio");
+      this.sound.src = src;
+      this.sound.setAttribute("preload", "auto");
+      this.sound.setAttribute("controls", "none");
+      this.sound.style.display = "none";
+      document.body.appendChild(this.sound);
+        this.play = function(){
+            this.sound.play();
+        }
+        this.stop = function(){
+            this.sound.pause();
+        }
+}
