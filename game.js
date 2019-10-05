@@ -8,6 +8,7 @@ var BGMusic;
 var Score;
 var sco = 0;
 var lives = 3;
+var spawn = 90;
 
 //initializing game (this includes canvas, listeners and constant updating of game area) and components
 function startGame() {
@@ -59,6 +60,10 @@ var gameArea = {
 	    })
         
     },
+    //TUGA
+    stop: function() {
+    	clearInterval(this.interval);
+    },
     
     clear: function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -87,7 +92,7 @@ function component(width, height, color, x, y, type) {
 		if (type == "image") {
       	context.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
-      	//tuga
+      	//TUGA
   		else if (this.type == "text") {
       		context.font = this.width + " " + this.height;
       		context.fillStyle = color;
@@ -113,8 +118,6 @@ function component(width, height, color, x, y, type) {
   	}
 
   	// TUGA
-  	
-
   	this.collect = function(otherobj) {
     var myleft = this.x;
     var myright = this.x + (this.width);
@@ -135,9 +138,13 @@ function component(width, height, color, x, y, type) {
     return collected;
   }
 
-}   
+} 
 
+//TUGA
 function updateGameArea() {
+	if (lives <= 0){
+		gameArea.stop();
+	}
     gameArea.clear();
     gameArea.frame += 1;
 
@@ -149,19 +156,25 @@ function updateGameArea() {
 	      Squirrel.x += 7;
 	    }
  	}
- 	for(i = 0; i<Hazelnut.length; i += 1){
+ 	for(i = 0; i<Hazelnut.length; i += 1) {
 		if (Squirrel.collect(Hazelnut[i])){
  			sco += 1;
- 			Hazelnut.splice(i);
- 		}
- 		if (Hazelnut[i].y > gameArea.canvas.height+64){
- 			Hazelnut.splice(i);
- 			lives -= 1;
+ 			spawn -= 1;
+ 			Hazelnut.splice(i, 1);
+ 			i--;
  		}
  	}
- 	if (gameArea.frame % 50 == 0 || gameArea.frame % 72 == 0 || gameArea.frame % 123 == 0){
+ 	for(j = 0; j<Hazelnut.length; j += 1){
+ 		if (Hazelnut[j].y > gameArea.canvas.height+64){
+ 			lives -= 1;
+ 			Hazelnut.splice(j, 1);
+ 			j--; 				
+ 		}	
+ 	}
+
+ 	if (gameArea.frame % spawn == 0){
  		nuty = -50;
- 		nutx = Math.random()*(gameArea.canvas.width);
+ 		nutx = Math.random()*(gameArea.canvas.width - 32);
  		size = Math.random()*10 + 40;
  		Hazelnut.push(new component(size, size, "resources/hazelnut.png", nutx, nuty, "image"));
  	}
