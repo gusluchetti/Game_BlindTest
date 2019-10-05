@@ -15,10 +15,12 @@ var lives = 3;
 var spawn = 101;
 var bgmusic;
 var Background;
-var score, email;
-var godEmail;
-var topScore = 0, topEmail = "";
 
+var valueEmail, valueScore;
+var auxScore = 0, auxEmail;
+
+var tea = document.cookie;
+var cookies = "";
 
 //variable responsible for actual game canvas
 var gameArea = {
@@ -180,15 +182,15 @@ function startInput() {
     go.setAttribute("id", "go");
     go.innerHTML = "GAME OVER!\n";
 
-    score = document.createElement("p");
+    var score = document.createElement("p");
     score.setAttribute("id","score");
     score.setAttribute("value", sco);
     score.innerHTML = "Sua pontuação foi " + sco;
 
-    var a = document.createElement("label");
-    a.setAttribute("for", "email");
+    var label = document.createElement("label");
+    label.setAttribute("for", "email");
 
-    email = document.createElement("input");
+    var email = document.createElement("input");
     email.setAttribute("id","email");
     email.setAttribute("type","text");
     email.setAttribute("placeholder", "Insira seu email");
@@ -196,19 +198,20 @@ function startInput() {
     // button compares highscore with current score
     var benjamin = document.createElement("button");
     benjamin.setAttribute("id","send");
-    benjamin.setAttribute("onclick", "saveEmail(event)");
-    benjamin.setAttribute("onclick", "compare(" + godEmail + ", " + sco + ")\n");
+    benjamin.setAttribute("onclick", "valueEmail = document.getElementById('email').value");
+    benjamin.setAttribute("onclick", "valueScore = document.getElementById('score').value");
+    benjamin.setAttribute("onclick", "compare()");
     benjamin.innerHTML = "Enviar";    
 
     // button shows current highscore
     var high = document.createElement("button");
     high.setAttribute("id","highscore");
-    high.setAttribute("onclick", "window.alert(" + topScore + ", " + topEmail + ")");
+    high.setAttribute("onclick", "allCookies()");
     high.innerHTML = "Mostrar highscore!";
 
     document.getElementById("gameOver").appendChild(go);
     document.getElementById("gameOver").appendChild(score);
-    document.getElementById("gameOver").appendChild(a);
+    document.getElementById("gameOver").appendChild(label);
     document.getElementById("gameOver").appendChild(email);
     document.getElementById("gameOver").appendChild(benjamin);
     document.getElementById("gameOver").appendChild(high);
@@ -442,17 +445,48 @@ function updateCanvas() {
         }
     }
 
-    function compare (email, score) {
-        this.email = email;
-        this.score = score;
+    //setting cookie
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*1000*60*60*24));
+        var expires = "expires=" + d.toGMTString();
+        tea = "";
+        tea = cname + "=" + cvalue +"; "+ expires;
 
-        if (score > topScore) {
-            topScore = score;
-            topEmail = email;
-        }     
-    }    
+    }
 
-    function saveEmail(event) {
-        godEmail = document.getElementById('email').value;
-        event.preventDefault();
-}
+    //deleting cookie
+    function deleteCookie(cname) {
+        var d = new Date();
+        d.setTime(d.getTime() - (1000*60*60*24));
+        var expires = "expires=" + d.toGMTString();
+        tea = cname + "=" + "; "+ expires;
+    }
+
+    function allCookies() {
+        var cookieArray = tea.split(';'); //Create cookie array by split the cookie by ';'
+     
+        //Loop through all the cookies and display them with cookie name = cookie value
+        for(var i=0; i<cookieArray.length; i++) {
+            cookies += cookieArray[i].trim(); //Put the cookie name and cookie value in the p elment
+        }
+
+        window.alert(cookies);
+    }
+
+    function compare() {
+        // if no cookie has been made, save score/email
+        if (!tea) {
+            setCookie("Email: ", document.getElementById('email').value, 10);
+            setCookie("Score: ", sco, 10);
+        }
+
+        // if current score is bigger than aux, delete old cookies and make new ones
+        else if (sco > auxScore && tea) {
+            auxScore = sco;
+            deleteCookie("Email: "); 
+            deleteCookie("Score: ");
+            setCookie("Email: ", document.getElementById('email').value, 10);
+            setCookie("Score: ", sco, 10);
+        }
+    }
