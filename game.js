@@ -128,7 +128,6 @@ function startGame() {
     var gaH = gameArea.canvas.height;
     Background = new component(gaW, gaH, "resources/bg.jpg", 0, 0, "image");
     Squirrel = new component(64, 64, "resources/squirrel.png", gaW / 2 - 32, gaH - 64, "image");
-    Hazelnut = new component(64, 64, "resources/hazelnut.png", 30, 30, "image");
     Left = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", 0, gaH - (gaH / 2), "button");
     Right = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", gaW - gaW / 2, gaH - (gaH / 2), "button");
     Score = new component("30px", "Consolas", "black", 200, 40, "score");}
@@ -184,7 +183,8 @@ function component(width, height, color, x, y, type) {
       		context.font = this.width + " " + this.height;
       		context.fillStyle = color;
       		context.fillText(this.text, this.x, this.y);
-        
+        }
+
         else {
             context.fillStyle = "rgba(233, 141, 1, 1)";
             context.fillRect(this.x, this.y, this.width, this.height);
@@ -213,7 +213,7 @@ function component(width, height, color, x, y, type) {
     }
         
         return clicked;
-    }}   
+    }
 
     //collision detection
     this.collect = function(otherobj) {
@@ -230,14 +230,15 @@ function component(width, height, color, x, y, type) {
         collected = false;
     }
         return collected;
-    }
-    
+    }}   
+
 // updates canvas according to set interval (50fps in this case)
 function updateCanvas() {
     
     //game over check
     if (lives <= 0 && game){
 		gameArea.stop();
+        game = false;
 	}
     
     // update depending on current canvas
@@ -262,7 +263,7 @@ function updateCanvas() {
  	}
     
     //hazelnut out of bounds
-    for(j = 0; j<Hazelnut.length; j += 1){
+    for(j = 0; j<Hazelnut.length; j += 1) {
  		if (Hazelnut[j].y > gameArea.canvas.height+64){
  			lives -= 1;
  			Hazelnut.splice(j, 1);
@@ -278,17 +279,11 @@ function updateCanvas() {
  		Hazelnut.push(new component(size, size, "resources/hazelnut.png", nutx, nuty, "image"));
  	}
     
-    //hazelnut movement (y-axis)
-    for(i = 0; i<Hazelnut.length; i += 1){
-    	Hazelnut[i].y += 5;
-    	Hazelnut[i].update();
-    }
-    
     //end of game mechanics
     
     // start game when start button is pressed
     if (menuScreen.x && menuScreen.y) {
-        if (StartButton.clicked()) {
+        if (StartButton.clicked() && title) {
             // deleting old canvas so that new canvas can be created
             old = document.getElementById("canvas");
             old.remove();
@@ -311,6 +306,13 @@ function updateCanvas() {
     // updates for gameArea
     if (game) {
         Background.update();
+
+        //hazelnut movement (y-axis)
+        for(i = 0; i<Hazelnut.length; i += 1){
+            Hazelnut[i].y += 5;
+            Hazelnut[i].update();
+        }
+
         Squirrel.update();
         Left.update();
         Right.update();
