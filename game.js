@@ -408,7 +408,7 @@ function updateCanvas() {
         //hazelnut movement (y-axis)
         for(i = 0; i<Hazelnut.length; i += 1){
             //hazelnut speed
-            Hazelnut[i].y += 5;
+            Hazelnut[i].y += 4;
             Hazelnut[i].update();
         }
 
