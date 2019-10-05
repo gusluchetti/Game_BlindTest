@@ -6,9 +6,13 @@ var StartText;
 var StartButton;
 var TitleScreen;
 var Squirrel;
-var Hazelnut;
+var Hazelnut = [];
 var Left;
 var Right;
+var Score;
+var sco = 0;
+var lives = 3;
+var spawn = 90;
 var Background;
 
 //variable responsible for actual game canvas
@@ -24,6 +28,7 @@ var gameArea = {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateCanvas, 20);
+        this.frame = 0;
 
         //listening for mouse click
         window.addEventListener('mousedown', function (e) {
@@ -49,6 +54,10 @@ var gameArea = {
             gameArea.y = false;
         })
         
+    },
+    
+    stop: function() {
+    	clearInterval(this.interval);
     },
     
     clear: function() {
@@ -121,7 +130,8 @@ function startGame() {
     Squirrel = new component(64, 64, "resources/squirrel.png", gaW / 2 - 32, gaH - 64, "image");
     Hazelnut = new component(64, 64, "resources/hazelnut.png", 30, 30, "image");
     Left = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", 0, gaH - (gaH / 2), "button");
-    Right = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", gaW - gaW / 2, gaH - (gaH / 2), "button");}
+    Right = new component(gaW / 2 + 50, gaH / 2, "rgba(255, 255, 255, 0.5)", gaW - gaW / 2, gaH - (gaH / 2), "button");
+    Score = new component("30px", "Consolas", "black", 200, 40, "score");}
 
 // facilitates creation of objects in current canvas
 function component(width, height, color, x, y, type) {
@@ -168,9 +178,13 @@ function component(width, height, color, x, y, type) {
         context.textAlign = "center";
         context.fillStyle = "rgba(255, 255, 255, 1)";
         context.fillText("COMEÇAR!", (msW / 2), msH / 1.5); 
-    
         }
 
+        else if (this.type == "score") {
+      		context.font = this.width + " " + this.height;
+      		context.fillStyle = color;
+      		context.fillText(this.text, this.x, this.y);
+        
         else {
             context.fillStyle = "rgba(233, 141, 1, 1)";
             context.fillRect(this.x, this.y, this.width, this.height);
@@ -201,8 +215,30 @@ function component(width, height, color, x, y, type) {
         return clicked;
     }}   
 
+    //collision detection
+    this.collect = function(otherobj) {
+    var myleft = this.x;
+    var myright = this.x + (this.width);
+    var mytop = this.y;
+    var mybottom = this.y + (this.height);
+    var otherleft = otherobj.x;
+    var otherright = otherobj.x + (otherobj.width);
+    var othertop = otherobj.y;
+    var otherbottom = otherobj.y + (otherobj.height);
+    var collected = true;
+    if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+        collected = false;
+    }
+        return collected;
+    }
+    
 // updates canvas according to set interval (50fps in this case)
 function updateCanvas() {
+    
+    //game over check
+    if (lives <= 0 && game){
+		gameArea.stop();
+	}
     
     // update depending on current canvas
     if (title) {
@@ -210,8 +246,46 @@ function updateCanvas() {
     }
     else if (game){
         gameArea.clear();
+        gameArea.frame += 1;
     }
 
+    //game mechanics
+    
+    //hazelnut collect
+    for(i = 0; i<Hazelnut.length; i += 1) {
+		if (Squirrel.collect(Hazelnut[i])){
+ 			sco += 1;
+ 			spawn -= 1;
+ 			Hazelnut.splice(i, 1);
+ 			i--;
+ 		}
+ 	}
+    
+    //hazelnut out of bounds
+    for(j = 0; j<Hazelnut.length; j += 1){
+ 		if (Hazelnut[j].y > gameArea.canvas.height+64){
+ 			lives -= 1;
+ 			Hazelnut.splice(j, 1);
+ 			j--; 				
+ 		}	
+ 	}
+    
+    //hazelnut spawning
+    if (gameArea.frame % spawn == 0) {
+ 		nuty = -50;
+ 		nutx = Math.random()*(gameArea.canvas.width - 32);
+ 		size = Math.random()*10 + 40;
+ 		Hazelnut.push(new component(size, size, "resources/hazelnut.png", nutx, nuty, "image"));
+ 	}
+    
+    //hazelnut movement (y-axis)
+    for(i = 0; i<Hazelnut.length; i += 1){
+    	Hazelnut[i].y += 5;
+    	Hazelnut[i].update();
+    }
+    
+    //end of game mechanics
+    
     // start game when start button is pressed
     if (menuScreen.x && menuScreen.y) {
         if (StartButton.clicked()) {
@@ -240,7 +314,8 @@ function updateCanvas() {
         Squirrel.update();
         Left.update();
         Right.update();
-        Hazelnut.update();
+        Score.text = "Pontos: " + sco + " Vidas: " + lives;
+ 	    Score.update();
     }
 
     // updates for titleScreen
