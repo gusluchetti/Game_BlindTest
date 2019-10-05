@@ -25,6 +25,9 @@ var gameArea = {
         this.canvas.setAttribute("id", "game");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        if (this.canvas.width > 800) {
+            this.canvas.width = 800;
+        }
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateCanvas, 20);
@@ -73,6 +76,9 @@ var menuScreen = {
         this.canvas.setAttribute("id", "canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        if (this.canvas.width > 800) {
+            this.canvas.width = 800;
+        }
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateCanvas, 20);
@@ -173,16 +179,17 @@ function component(width, height, color, x, y, type) {
         }
 
         else if (type == "text") {
-        context.font = "24px Arial";
-        context.textAlign = "center";
-        context.fillStyle = "rgba(255, 255, 255, 1)";
-        context.fillText("COMEÇAR!", (msW / 2), msH / 1.5); 
+            context.font = "24px Arial";
+            context.textAlign = "center";
+            context.fillStyle = "rgba(255, 255, 255, 1)";
+            context.fillText("COMEÇAR!", (msW / 2), msH / 1.5); 
         }
 
         else if (this.type == "score") {
       		context.font = this.width + " " + this.height;
       		context.fillStyle = color;
-      		context.fillText(this.text, this.x, this.y);
+            context.textAlign = "center";
+      		context.fillText(this.text, (msW / 2), msH / 20);
         }
 
         else {
